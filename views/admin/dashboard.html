@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{.Title}} | SukaMCD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body { @apply bg-[#09090b] text-[#fafafa] antialiased selection:bg-white selection:text-black min-h-screen flex overflow-hidden font-sans; }
+        }
+        @layer components {
+            .sidebar-item:hover { @apply bg-white/5; }
+            .sidebar-item.active { @apply bg-white/10 border-r-2 border-white; }
+            .glass-panel { @apply bg-zinc-900/80 border border-zinc-800; }
+        }
+    </style>
+</head>
+
+<body class="flex w-full">
+    <!-- Sidebar -->
+    {{template "sidebar" .}}
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col h-screen overflow-hidden bg-black">
+        <!-- Header -->
+        {{template "header" .}}
+
+        <!-- Scrollable Content -->
+        <div class="flex-grow overflow-y-auto p-8 space-y-8">
+            <!-- Row 1: Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-4 rounded-xl">
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Active Projects</p>
+                    <p class="text-2xl font-semibold">12</p>
+                </div>
+                <div class="glass-panel p-4 rounded-xl">
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">API Requests (24h)</p>
+                    <p class="text-2xl font-semibold">4.8k</p>
+                </div>
+                <div class="glass-panel p-4 rounded-xl">
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Memory Usage</p>
+                    <p class="text-2xl font-semibold">42%</p>
+                </div>
+                <div class="glass-panel p-4 rounded-xl">
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">System Health</p>
+                    <p class="text-2xl font-semibold text-emerald-400">Stable</p>
+                </div>
+            </div>
+
+            <!-- Row 2: Projects & Terminal -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 h-[400px]">
+                <div class="xl:col-span-2 glass-panel rounded-2xl flex flex-col">
+                    <div class="p-6 border-b border-zinc-800 flex justify-between items-center text-xs">
+                        <h2 class="text-sm font-semibold text-white">Project Summary</h2>
+                    </div>
+                    <div class="flex-grow overflow-y-auto p-2">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-zinc-500 border-b border-zinc-800">
+                                    <th class="p-4 font-normal text-xs uppercase tracking-wider">Name</th>
+                                    <th class="p-4 font-normal text-xs uppercase tracking-wider text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-zinc-900 transition-colors border-b border-zinc-900/50">
+                                    <td class="p-4 font-medium flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+                                        SukaMCD v2 (Go)
+                                    </td>
+                                    <td class="p-4 text-right">
+                                        <a href="#" class="text-[10px] text-zinc-500 hover:text-white transition-colors uppercase font-medium">Manage</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Terminal -->
+                <div class="glass-panel rounded-2xl flex flex-col bg-black overflow-hidden relative border-zinc-700/50">
+                    <div class="p-3 bg-zinc-900/50 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="flex gap-1.5">
+                                <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+                                <div class="w-2 h-2 rounded-full bg-amber-500/50"></div>
+                                <div class="w-2 h-2 rounded-full bg-emerald-500/50"></div>
+                            </div>
+                            <span class="text-[10px] text-zinc-500 font-mono ml-2">sukamcd@v2:~</span>
+                        </div>
+                    </div>
+                    <div id="terminal" class="flex-grow p-1 overflow-hidden"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function logout() { window.location.href = '/admin/logout'; }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const term = new Terminal({
+                cursorBlink: true,
+                fontFamily: 'Fira Code, monospace',
+                fontSize: 11,
+                theme: {
+                    background: '#09090b',
+                    foreground: '#fafafa',
+                    cursor: '#10b981',
+                }
+            });
+            const fitAddon = new FitAddon.FitAddon();
+            term.loadAddon(fitAddon);
+            term.open(document.getElementById('terminal'));
+            fitAddon.fit();
+
+            window.addEventListener('resize', () => fitAddon.fit());
+
+            let currentLine = '';
+            let currentCwd = '~';
+
+            function getPrompt() {
+                return `\r\n\x1b[32msukamcd@v2\x1b[0m:\x1b[34m${currentCwd}\x1b[0m$ `;
+            }
+
+            term.write('\r\n\x1b[1;32mSukaMCD v2 Terminal\x1b[0m\r\n');
+            term.write(getPrompt());
+
+            term.onData(e => {
+                switch (e) {
+                    case '\r': // Enter
+                        runCommand(currentLine);
+                        currentLine = '';
+                        break;
+                    case '\u007F': // Backspace
+                        if (currentLine.length > 0) {
+                            term.write('\b \b');
+                            currentLine = currentLine.substring(0, currentLine.length - 1);
+                        }
+                        break;
+                    default:
+                        if (e >= ' ' && e <= '~') {
+                            currentLine += e;
+                            term.write(e);
+                        }
+                }
+            });
+
+            async function runCommand(command) {
+                term.write('\r\n');
+                if (command.trim() === '') {
+                    term.write(getPrompt());
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/admin/terminal", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ command: command, cwd: currentCwd === '~' ? '' : currentCwd })
+                    });
+                    const data = await response.json();
+                    if (data.output) term.write(data.output.replace(/\n/g, '\r\n'));
+                    if (data.cwd) currentCwd = data.cwd;
+                } catch (error) {
+                    term.write('\x1b[1;31mError: ' + error.message + '\x1b[0m');
+                }
+                term.write(getPrompt());
+            }
+        });
+    </script>
+</body>
+
+</html>

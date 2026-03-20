@@ -1,0 +1,26 @@
+# Binaries
+main
+main.exe
+*.exe
+*.exe~
+*.test
+*.prof
+
+# Project Specific
+.env
+tmp/
+*.zip
+*.sql
+
+# Dependencies
+vendor/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS Specific
+.DS_Store
+Thumbs.db
