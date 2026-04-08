@@ -54,7 +54,7 @@ export default function GatewayPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full bg-transparent border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-zinc-600 transition-colors"
-              placeholder="admin@sukamcd.dev"
+              placeholder="admin@gmail.com"
             />
           </div>
 

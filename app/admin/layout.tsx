@@ -15,11 +15,17 @@ export default async function AdminLayout({
     redirect("/gateway");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("profile_picture")
+    .eq("id", user.id)
+    .single();
+
   return (
     <div className="flex h-screen overflow-hidden bg-black text-zinc-100">
       <Sidebar />
       <div className="relative flex flex-1 flex-col overflow-hidden">
-        <AdminHeader user={user} />
+        <AdminHeader user={user} profile={profile} />
         <main className="flex-1 p-8 overflow-y-auto">
           {children}
         </main>

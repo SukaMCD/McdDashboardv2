@@ -1,14 +1,15 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
 import { type User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 interface AdminHeaderProps {
   user: User;
+  profile: { profile_picture: string | null } | null;
 }
 
-export default function AdminHeader({ user }: AdminHeaderProps) {
+export default function AdminHeader({ user, profile }: AdminHeaderProps) {
   const [uptime, setUptime] = useState("0d 0h 0m");
 
   useEffect(() => {
@@ -51,34 +52,26 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
       </div>
 
       <div className="flex items-center gap-5">
-        <div className="flex items-center gap-2 bg-zinc-950/50 border border-zinc-900 rounded-xl px-4 py-2 group focus-within:border-zinc-700 transition-all">
-          <Search className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400" />
-          <input 
-            type="text" 
-            placeholder="Search system..." 
-            className="bg-transparent text-xs text-zinc-300 focus:outline-none w-40 placeholder-zinc-700"
-          />
-        </div>
-
-        <button className="p-2.5 hover:bg-zinc-900 rounded-xl transition-all text-zinc-500 hover:text-white group relative">
-          <Bell className="w-4 h-4 transition-transform group-hover:rotate-12" />
-          <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-emerald-500 rounded-full border border-black"></span>
-        </button>
-        
         <div className="flex items-center gap-4 pl-5 border-l border-zinc-900">
           <div className="flex flex-col items-end">
             <span className="text-xs font-semibold text-zinc-200 tracking-tight">{user.email}</span>
             <span className="text-[9px] text-emerald-500/80 uppercase tracking-widest font-black">Authorized Admin</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-950 border border-zinc-800 flex items-center justify-center overflow-hidden transition-all hover:border-zinc-600 shadow-xl group cursor-pointer">
-            {user.user_metadata?.avatar_url ? (
+            {profile?.profile_picture ? (
+              <img 
+                src={profile.profile_picture} 
+                alt="Profile" 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+              />
+            ) : user.user_metadata?.avatar_url ? (
               <img 
                 src={user.user_metadata.avatar_url} 
                 alt="Profile" 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
               />
             ) : (
-              <span className="text-sm font-bold uppercase text-zinc-400">
+              <span className="text-sm font-bold uppercase text-zinc-400 font-mono">
                 {username.charAt(0)}
               </span>
             )}
