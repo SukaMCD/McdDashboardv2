@@ -13,7 +13,9 @@ export default async function DashboardPage() {
     getDashboardStats()
   ]);
 
-  const dashStats = dashResult.success ? dashResult.data : { totalBackups: 0, securityAlerts: 0, systemStatus: 'Unknown' };
+  const dashStats = (dashResult.success && dashResult.data) 
+    ? dashResult.data 
+    : { totalBackups: 0, securityAlerts: 0, systemStatus: 'Unknown' };
   const onlineProjects = projects.filter(p => p.status === 'ONLINE').length;
 
   const stats = [
