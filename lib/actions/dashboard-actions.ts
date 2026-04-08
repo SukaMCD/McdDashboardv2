@@ -2,7 +2,20 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 
-export async function getDashboardStats() {
+export async function getDashboardStats(): Promise<{
+  success: boolean;
+  data?: {
+    totalBackups: number;
+    securityAlerts: number;
+    systemStatus: string;
+    integrityInfo: {
+      supabase: boolean;
+      gdrive: boolean;
+      ai: boolean;
+    };
+  };
+  error?: string;
+}> {
   const supabase = await createServerSupabaseClient();
   
   try {
